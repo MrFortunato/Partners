@@ -3,6 +3,12 @@
   <Folder Name="/Itens de Solução/">
     <File Path=".gitignore" />
   </Folder>
-  <Folder Name="/src/" />
+  <Folder Name="/src/">
+    <Project Path="Partners.Api/Partners.Api.csproj" />
+    <Project Path="Partners.Aplication/Partners.Aplication.csproj" />
+    <Project Path="Partners.Domain/Partners.Domain.csproj" />
+    <Project Path="Partners.Infra.Data/Partners.Infra.Data.csproj" />
+    <Project Path="Partners.Infra.Ioc/Partners.Infra.Ioc.csproj" />
+  </Folder>
   <Folder Name="/tests/" />
 </Solution>
