@@ -2,24 +2,21 @@
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Partners.Domain;
 
-namespace Partners.Infra.Data.DbSchemaBuilder
+namespace Partners.Infra.Data
 {
     internal class PartnersSchemaBuilder : IEntityTypeConfiguration<Partner>
     {
 
         public void Configure(EntityTypeBuilder<Partner> builder)
         {
-            // Nome da tabela (boa prática especificar explicitamente)
+      
             builder.ToTable("Partners");
 
             builder.HasKey(x => x.Id);
 
-            // Propriedades da tabela
             builder.Property(x => x.Id)
                 .ValueGeneratedOnAdd()
                 .IsRequired();
-            // Nota: Se 'Id' for Guid, o EF Core mapeia nativamente para 'UNIQUEIDENTIFIER' no SQL Server. 
-            // Remova o HasColumnType("BINARY(16)"), a menos que esteja guardando o Guid como binário de forma customizada.
 
             builder.Property(x => x.Name)
                 .HasMaxLength(100)

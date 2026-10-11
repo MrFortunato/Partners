@@ -1,17 +1,20 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Partners.Domain;
 
-namespace Partners.Infra.Data
+public class AppDbContext : DbContext
 {
-    internal class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(options)
+    public AppDbContext(DbContextOptions<AppDbContext> options)
+        : base(options)
     {
-        public DbSet<Partner> Partner { get; set; }
-
-        protected override void OnModelCreating(ModelBuilder modelBuilder)
-        {
-            base.OnModelCreating(modelBuilder);
-            modelBuilder.ApplyConfigurationsFromAssembly(typeof(AppDbContext).Assembly);
-        }
     }
 
+    public DbSet<Partner> Partners { get; set; } 
+
+    protected override void OnModelCreating(ModelBuilder modelBuilder)
+    {
+        base.OnModelCreating(modelBuilder);
+
+        modelBuilder.ApplyConfigurationsFromAssembly(
+            typeof(AppDbContext).Assembly);
+    }
 }
