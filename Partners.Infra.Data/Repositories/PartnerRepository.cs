@@ -14,36 +14,23 @@ public class PartnerRepository : IPartnerRepository
         _dbContext = dbContext;
     }
 
-    public async Task<IReadOnlyList<Partner>> GetAllAsync(
-        CancellationToken cancellationToken = default)
+    public async Task<IEnumerable<Partner>> GetAllAsync(CancellationToken cancellationToken = default)
     {
-        return await _dbContext.Partners
-            .AsNoTracking()
-            .ToListAsync(cancellationToken);
+        return await _dbContext.Partners.AsNoTracking().ToListAsync(cancellationToken);
     }
 
-    public async Task<Partner?> GetByIdAsync(
-        Guid id,
-        CancellationToken cancellationToken = default)
+    public async Task<Partner?> GetByIdAsync(Guid id, CancellationToken cancellationToken = default)
     {
-        return await _dbContext.Partners
-            .FirstOrDefaultAsync(
-                partner => partner.Id == id,
-                cancellationToken);
+        return await _dbContext.Partners.FirstOrDefaultAsync(partner => partner.Id == id,cancellationToken);
     }
 
-    public async Task<bool> ExistsByTaxNumberAsync(
-        string taxNumber,
-        Guid? excludedId = null,
-        CancellationToken cancellationToken = default)
+    public async Task<bool> ExistsByTaxNumberAsync(string taxNumber,Guid? excludedId = null, CancellationToken cancellationToken = default)
     {
-        var query = _dbContext.Partners
-            .Where(partner => partner.TaxNumber == taxNumber);
+        var query = _dbContext.Partners.Where(partner => partner.TaxNumber == taxNumber);
 
         if (excludedId.HasValue)
         {
-            query = query.Where(
-                partner => partner.Id != excludedId.Value);
+            query = query.Where(partner => partner.Id != excludedId.Value);
         }
 
         return await query.AnyAsync(cancellationToken);
@@ -64,8 +51,7 @@ public class PartnerRepository : IPartnerRepository
         _dbContext.Partners.Remove(partner);
     }
 
-    public async Task SaveChangesAsync(
-        CancellationToken cancellationToken = default)
+    public async Task SaveChangesAsync(CancellationToken cancellationToken = default)
     {
         await _dbContext.SaveChangesAsync(cancellationToken);
     }

@@ -17,8 +17,7 @@ public class PartnerService : IPartnerService
 
     public async Task<PartnerDetailsDto?> GetByIdAsync(Guid id, CancellationToken cancellationToken = default)
     {
-        var partner = await _repository.GetByIdAsync(
-            id, cancellationToken);
+        var partner = await _repository.GetByIdAsync(id, cancellationToken);
 
         return partner is null? null: PartnerMapper.ToDto(partner);
     }
@@ -27,9 +26,7 @@ public class PartnerService : IPartnerService
     {
         var partners = await _repository.GetAllAsync(cancellationToken);
 
-        return partners.AsEnumerable<Partner>()
-                .Select(PartnerMapper.ToDto)
-                .ToList();
+        return [.. partners.AsEnumerable<Partner>().Select(PartnerMapper.ToDto)];
     }
 
     public async Task<PartnerDetailsDto> CreateAsync(CreatePartnerDto dto, CancellationToken cancellationToken = default)
@@ -90,7 +87,7 @@ public class PartnerService : IPartnerService
 
         partner.Name = dto.Name;
         partner.TaxNumber = dto.TaxNumber;
-        partner.Type = dto.Type.ToString(); // Converte o Enum do DTO para a string que a Entidade espera
+        partner.Type = dto.Type.ToString(); 
         partner.Email = dto.Email;
         partner.CreditLimit = dto.CreditLimit;
         partner.IsActive = dto.IsActive;

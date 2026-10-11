@@ -1,6 +1,9 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Partners.Aplication;
+using Partners.Application;
+using Partners.Domain.Interfaces;
 using Partners.Infra.Data;
 
 namespace Partners.Infra.Ioc
@@ -20,5 +23,16 @@ namespace Partners.Infra.Ioc
             });
             return services;
         }
+
+        public static IServiceCollection ConfigureRepositoryDependencies(this IServiceCollection services)
+        {
+            services.AddScoped(typeof(IPartnerRepository), typeof(PartnerRepository));
+
+            services.AddScoped(typeof(IPartnerService), typeof(PartnerService));
+
+
+            return services;
+        }
+
     }
 }
