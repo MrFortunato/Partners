@@ -18,6 +18,7 @@ if (app.Environment.IsDevelopment())
     { 
         x.DocumentTitle ="Partners Api - v1";
         x.SwaggerEndpoint("/swagger/v1/swagger.json", "Partners Api - v1");
+        x.RoutePrefix = string.Empty;
     });
 }
 
