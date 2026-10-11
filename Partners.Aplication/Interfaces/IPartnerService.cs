@@ -13,5 +13,4 @@ public interface IPartnerService
 
     Task<PartnerDetailsDto?> UpdateAsync(Guid id,UpdatePartnerDto dto, CancellationToken cancellationToken = default);
 
-    Task<bool> DeleteAsync(Guid id,CancellationToken cancellationToken = default);
 }

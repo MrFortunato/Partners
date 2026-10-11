@@ -12,7 +12,5 @@ public interface IPartnerRepository
 
     void Update(Partner partner);
 
-    void Delete(Partner partner);
-
     Task SaveChangesAsync(CancellationToken cancellationToken = default);
 }

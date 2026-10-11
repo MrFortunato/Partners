@@ -3,6 +3,7 @@ using Partners.Aplication;
 using Partners.Application.Mappings;
 using Partners.Domain;
 using Partners.Domain.Interfaces;
+using System.Text.RegularExpressions;
 
 namespace Partners.Application;
 
@@ -61,52 +62,44 @@ public class PartnerService(IPartnerRepository repository) : IPartnerService
 
     public async Task<PartnerDetailsDto?> UpdateAsync(Guid id,UpdatePartnerDto dto, CancellationToken cancellationToken = default)
     {
-        ArgumentNullException.ThrowIfNull(dto);
-
-        ValidateCreditLimit(dto.CreditLimit);
-
-        if (!Enum.IsDefined(typeof(PartnerType), dto.Type))
-        {
-            throw new ArgumentException("Tipo de parceiro inválido.", nameof(dto.Type));
-        }
-
         var partner = await _repository.GetByIdAsync(id, cancellationToken);
-
         if (partner is null)
-            return null;
-
-        if (await _repository.ExistsByTaxNumberAsync(dto.TaxNumber, excludedId: id, cancellationToken: cancellationToken))
         {
-            throw new InvalidOperationException("Já existe outro parceiro com este número fiscal.");
+            throw new KeyNotFoundException("Parceiro não encontrado.");
         }
 
-        partner.Name = dto.Name;
-        partner.TaxNumber = dto.TaxNumber;
-        partner.Type = dto.Type.ToString(); 
+        if (partner.Version != dto.Version)
+        {
+            throw new InvalidOperationException("O registo foi modificado por outro utilizador. Por favor, atualize os dados.");
+        }
+
+        var cleanedTaxNumber = Regex.Replace(dto.TaxNumber ?? string.Empty, @"\D", "");
+        if (cleanedTaxNumber.Length != 9)
+        {
+            throw new ArgumentException("O TaxNumber deve conter exatamente 9 dígitos numéricos.");
+        }
+
+        var existingPartnerWithTax = await _repository.ExistsByTaxNumberAsync(cleanedTaxNumber, id, cancellationToken);
+        if (existingPartnerWithTax)
+        {
+            throw new ArgumentException("Já existe outro parceiro registado com este TaxNumber.");
+        }
+
+        partner.Name = dto.Name.Trim();
+        partner.TaxNumber = cleanedTaxNumber;
+        partner.Type = dto.Type.ToString();
         partner.Email = dto.Email;
         partner.CreditLimit = dto.CreditLimit;
-        partner.IsActive = dto.IsActive;
-        partner.Version++;
+        partner.IsActive = dto.IsActive; 
         partner.UpdatedAt = DateTime.UtcNow;
+        partner.Version += 1;
 
         await _repository.SaveChangesAsync(cancellationToken);
 
         return PartnerMapper.ToDto(partner);
     }
 
-    public async Task<bool> DeleteAsync(Guid id, CancellationToken cancellationToken = default)
-    {
-        var partner = await _repository.GetByIdAsync(id, cancellationToken);
 
-        if (partner is null)
-            return false;
-
-        _repository.Delete(partner);
-
-        await _repository.SaveChangesAsync(cancellationToken);
-
-        return true;
-    }
 
     private static void ValidateCreditLimit(decimal creditLimit)
     {
