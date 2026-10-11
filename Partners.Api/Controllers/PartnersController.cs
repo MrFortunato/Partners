@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Partners.Infra.Data;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
@@ -8,6 +9,12 @@ namespace Partners.Api.Controllers
     [ApiController]
     public class PartnersController : ControllerBase
     {
+        private readonly PartnerRepository _partnerRepository;
+
+        public PartnersController(PartnerRepository partnerRepository)
+        {
+            _partnerRepository = partnerRepository; 
+        }
         // GET: api/<PartnersController>
         [HttpGet]
         public IEnumerable<string> Get()
