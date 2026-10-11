@@ -3,7 +3,7 @@ using Partners.Domain;
 
 namespace Partners.Application;
 
-public class PartnerListDto
+public class PartnerDetailsDto
 {
     public Guid Id { get; set; }
 
@@ -18,6 +18,8 @@ public class PartnerListDto
     public decimal CreditLimit { get; set; }
 
     public bool IsActive { get; set; }
+
+    public int Version { get; set; }    
 
     public DateTime CreatedAt { get; set; }
 
