@@ -31,7 +31,7 @@ namespace Partners.Domain
         }
 
         [Required(ErrorMessage = "O tipo é obrigatório.")]
-        [EnumDataType(typeof(PartnerType),ErrorMessage = "O tipo deve ser CUSTOMER, SUPPLIER ou BOTH.")]
+        [EnumDataType(typeof(PartnerType),ErrorMessage = "O tipo deve ser Cliente, Fornecedor ou Ambos.")]
         public PartnerType Type { get; set; }
 
         private string? _email;
