@@ -6,14 +6,9 @@ using Partners.Domain.Interfaces;
 
 namespace Partners.Application;
 
-public class PartnerService : IPartnerService
+public class PartnerService(IPartnerRepository repository) : IPartnerService
 {
-    private readonly IPartnerRepository _repository;
-
-    public PartnerService(IPartnerRepository repository)
-    {
-        _repository = repository;
-    }
+    private readonly IPartnerRepository _repository = repository;
 
     public async Task<PartnerDetailsDto?> GetByIdAsync(Guid id, CancellationToken cancellationToken = default)
     {
@@ -53,7 +48,7 @@ public class PartnerService : IPartnerService
             Type = dto.Type.ToString(),
             Email = dto.Email,
             CreditLimit = dto.CreditLimit,
-            IsActive = dto.IsActive,
+            IsActive = true,
             Version = 1
         };
 

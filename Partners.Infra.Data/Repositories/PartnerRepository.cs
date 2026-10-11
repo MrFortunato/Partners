@@ -5,14 +5,9 @@ using Partners.Domain.Interfaces;
 
 namespace Partners.Infra.Data;
 
-public class PartnerRepository : IPartnerRepository
+public class PartnerRepository(AppDbContext dbContext) : IPartnerRepository
 {
-    private readonly AppDbContext _dbContext;
-
-    public PartnerRepository(AppDbContext dbContext)
-    {
-        _dbContext = dbContext;
-    }
+    private readonly AppDbContext _dbContext = dbContext;
 
     public async Task<IEnumerable<Partner>> GetAllAsync(CancellationToken cancellationToken = default)
     {

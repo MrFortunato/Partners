@@ -7,7 +7,6 @@ namespace Partners.Aplication
 {
     public class CreatePartnerDto
     {
-        public Guid Id { get; set; } = Guid.NewGuid();
 
         [Required]
         [MaxLength(150)]
@@ -27,11 +26,11 @@ namespace Partners.Aplication
         public string TaxNumber
         {
             get => _taxNumber;
-            set => _taxNumber = NormalizeTaxNumber(value);
+            set => _taxNumber = value; /*NormalizeTaxNumber(value);*/
         }
 
         [Required(ErrorMessage = "O tipo é obrigatório.")]
-        [EnumDataType(typeof(PartnerType), ErrorMessage = "O tipo deve ser Cliente, Fornecedor ou Ambos.")]
+        [EnumDataType(typeof(PartnerType), ErrorMessage = "O tipo deve ser CUSTOMER, SUPPLIER ou BOTH.")]
         public PartnerType Type { get; set; }
 
         private string? _email;
@@ -60,28 +59,21 @@ namespace Partners.Aplication
         [Column(TypeName = "decimal(18,2)")]
         public decimal CreditLimit { get; set; }
 
-        public bool IsActive { get; set; } = true;
 
-        public int Version { get; set; } = 1;
-
-        public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
-
-        public DateTime? UpdatedAt { get; set; }
-
-        public static string NormalizeTaxNumber(string input)
-        {
-            if (string.IsNullOrWhiteSpace(input))
-                return string.Empty;
+        //public static string NormalizeTaxNumber(string input)
+        //{
+        //    if (string.IsNullOrWhiteSpace(input))
+        //        return string.Empty;
 
 
-            var cleaned = Regex.Replace(input, @"[\s\.\-]", "");
+        //    var cleaned = Regex.Replace(input, @"[\s\.\-]", "");
 
-            if (!Regex.IsMatch(cleaned, @"^\d{9}$"))
-            {
-                throw new ArgumentException("O TaxNumber normalizado deve conter exatamente 9 dígitos numéricos.");
-            }
+        //    if (!Regex.IsMatch(cleaned, @"^\d{9}$"))
+        //    {
+        //        throw new ArgumentException("O TaxNumber normalizado deve conter exatamente 9 dígitos numéricos.");
+        //    }
 
-            return cleaned;
-        }
+        //    return cleaned;
+        //}
     }
 }

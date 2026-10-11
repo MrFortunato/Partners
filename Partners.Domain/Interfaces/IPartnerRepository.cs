@@ -1,21 +1,12 @@
-﻿
-using Partners.Domain;
-
-namespace Partners.Domain.Interfaces;
+﻿namespace Partners.Domain.Interfaces;
 
 public interface IPartnerRepository
 {
-    Task<IEnumerable<Partner>> GetAllAsync(
-        CancellationToken cancellationToken = default);
+    Task<IEnumerable<Partner>> GetAllAsync(CancellationToken cancellationToken = default);
 
-    Task<Partner?> GetByIdAsync(
-        Guid id,
-        CancellationToken cancellationToken = default);
+    Task<Partner?> GetByIdAsync(Guid id, CancellationToken cancellationToken = default);
 
-    Task<bool> ExistsByTaxNumberAsync(
-        string taxNumber,
-        Guid? excludedId = null,
-        CancellationToken cancellationToken = default);
+    Task<bool> ExistsByTaxNumberAsync(string taxNumber, Guid? excludedId = null, CancellationToken cancellationToken = default);
 
     void Add(Partner partner);
 
@@ -23,6 +14,5 @@ public interface IPartnerRepository
 
     void Delete(Partner partner);
 
-    Task SaveChangesAsync(
-        CancellationToken cancellationToken = default);
+    Task SaveChangesAsync(CancellationToken cancellationToken = default);
 }

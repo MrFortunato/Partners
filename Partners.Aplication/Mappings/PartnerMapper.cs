@@ -19,7 +19,7 @@ public static class PartnerMapper
             IsActive = partner.IsActive,
             Version = partner.Version,
             CreatedAt = partner.CreatedAt,
-            UpdatedAt = partner.UpdatedAt
+
         };
     }
 
