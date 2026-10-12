@@ -1,5 +1,4 @@
 ﻿
-using Partners.Aplication;
 using Partners.Application.Mappings;
 using Partners.Domain;
 using Partners.Domain.Interfaces;
