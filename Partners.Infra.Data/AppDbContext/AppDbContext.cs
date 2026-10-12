@@ -1,6 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using Partners.Domain;
-using Partners.Infra.Data;
+
+namespace Partners.Infra.Data;
 
 public class AppDbContext : DbContext
 {
@@ -9,14 +9,12 @@ public class AppDbContext : DbContext
     {
     }
 
-    public DbSet<Partner> Partners { get; set; } 
+    public DbSet<Domain.Partner> Partners { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
-        modelBuilder.ApplyConfiguration(new PartnersSchemaBuilder());
 
-        modelBuilder.ApplyConfigurationsFromAssembly(
-            typeof(AppDbContext).Assembly);
+        modelBuilder.ApplyConfigurationsFromAssembly(typeof(AppDbContext).Assembly);
     }
 }
