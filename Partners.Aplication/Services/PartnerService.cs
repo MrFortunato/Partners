@@ -1,4 +1,5 @@
 ﻿
+using Partners.Application.Exceptions;
 using Partners.Application.Mappings;
 using Partners.Application.Pagination;
 using Partners.Domain;
@@ -48,7 +49,7 @@ public class PartnerService(IPartnerRepository repository) : IPartnerService
 
         if (await _repository.ExistsByTaxNumberAsync(dto.TaxNumber, cancellationToken: cancellationToken))
         {
-            throw new InvalidOperationException("Já existe um Entidade com este número fiscal.");
+            throw new ConflictException("Já existe outra Entidade registado com este número fiscal.");
         }
 
         var partner = new Partner
@@ -80,7 +81,7 @@ public class PartnerService(IPartnerRepository repository) : IPartnerService
 
         if (partner.Version != dto.Version)
         {
-            throw new InvalidOperationException("O registo foi modificado por outro utilizador. Por favor, atualize os dados.");
+            throw new ConflictException("O registo foi modificado por outro utilizador. Por favor, atualize os dados.");
         }
 
         var cleanedTaxNumber = Regex.Replace(dto.TaxNumber ?? string.Empty, @"\D", "");
@@ -92,7 +93,7 @@ public class PartnerService(IPartnerRepository repository) : IPartnerService
         var existingPartnerWithTax = await _repository.ExistsByTaxNumberAsync(cleanedTaxNumber, id, cancellationToken);
         if (existingPartnerWithTax)
         {
-            throw new ArgumentException("Já existe outra Entidade registado com este número fiscal.");
+            throw new ConflictException("Já existe outra Entidade registado com este número fiscal.");
         }
 
         partner.Name = dto.Name.Trim();

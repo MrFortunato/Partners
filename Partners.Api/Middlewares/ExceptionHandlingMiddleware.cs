@@ -1,4 +1,5 @@
-﻿using System.Net;
+﻿using Partners.Application.Exceptions;
+using System.Net;
 using System.Text.Json;
 
 namespace Partners.Api.Middlewares;
@@ -36,6 +37,7 @@ public class ExceptionHandlingMiddleware
             KeyNotFoundException => (HttpStatusCode.NotFound, exception.Message),
             ArgumentException => (HttpStatusCode.BadRequest, exception.Message),
             InvalidOperationException => (HttpStatusCode.BadRequest, exception.Message),
+            ConflictException => (HttpStatusCode.Conflict, exception.Message),
             _ => (HttpStatusCode.InternalServerError, "Ocorreu um erro interno no servidor.")
         };
 

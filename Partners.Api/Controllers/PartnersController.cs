@@ -61,7 +61,7 @@ namespace Partners.Api.Controllers
         }
 
         // PUT: api/partners/{id}
-        [HttpPut("{id}")]
+        [HttpPut("{id:guid}")]
         public async Task<ActionResult<PartnerDetailsDto>> Update(Guid id, [FromBody] UpdatePartnerDto dto, CancellationToken cancellationToken = default)
         {
             if (!ModelState.IsValid)
