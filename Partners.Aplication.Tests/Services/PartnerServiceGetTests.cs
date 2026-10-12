@@ -4,6 +4,7 @@ using Partners.Application;
 using Partners.Domain;
 using Partners.Domain.Interfaces;
 using Partners.Aplication.Tests.TestData;
+using Xunit;
 
 namespace Partners.Aplication.Tests.Services;
 

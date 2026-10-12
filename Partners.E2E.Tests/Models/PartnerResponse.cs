@@ -1,8 +1,5 @@
-using System.Text.Json.Serialization;
-
 namespace Partners.E2E.Tests.Models;
 
-/// <summary>Modelo de resposta que espelha o JSON devolvido pela API.</summary>
 public class PartnerResponse
 {
     public Guid Id { get; set; }
@@ -16,7 +13,6 @@ public class PartnerResponse
     public DateTime CreatedAt { get; set; }
 }
 
-/// <summary>Modelo do corpo de erro devolvido pelo middleware.</summary>
 public class ErrorResponse
 {
     public int Status { get; set; }

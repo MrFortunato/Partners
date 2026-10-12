@@ -2,7 +2,9 @@ using System.Net;
 using FluentAssertions;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
+using Moq;
 using Partners.Api.Middlewares;
+using Xunit;
 
 namespace Partners.Api.Tests.Middlewares;
 

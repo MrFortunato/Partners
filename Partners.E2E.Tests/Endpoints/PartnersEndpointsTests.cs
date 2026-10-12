@@ -3,6 +3,7 @@ using System.Net.Http.Json;
 using FluentAssertions;
 using Partners.E2E.Tests.Infrastructure;
 using Partners.E2E.Tests.Models;
+using Xunit;
 
 namespace Partners.E2E.Tests.Endpoints;
 
@@ -29,7 +30,7 @@ public class PartnersEndpointsTests : IClassFixture<PartnersWebAppFactory>
             name = "Acme Lda",
             taxNumber = "123456789",
             type = "CUSTOMER",
-            email = "contact@acme.pt",
+            email = "contact@acme.ao",
             creditLimit = 5000.00m
         };
 
