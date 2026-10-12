@@ -116,7 +116,7 @@ public class PartnerService(IPartnerRepository repository) : IPartnerService
     {
         if (creditLimit < 0 || creditLimit > 1_000_000)
         {
-            throw new ArgumentOutOfRangeException(nameof(creditLimit), "O limite de crédito deve estar entre 0 e 1.000.000.");
+            throw new ArgumentException(nameof(creditLimit), "O limite de crédito deve estar entre 0 e 1.000.000.");
         }
 
         if (decimal.Round(creditLimit, 2) != creditLimit)

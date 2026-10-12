@@ -9,7 +9,7 @@ public class PartnerRepository(AppDbContext dbContext) : IPartnerRepository
 {
     private readonly AppDbContext _dbContext = dbContext;
 
-    public async Task<(IEnumerable<Partner> Items, int TotalCount)> GetAllAsync(string? search, string? type, bool includeInactive, int page, int pageSize,CancellationToken cancellationToken = default)
+    public async Task<(IEnumerable<Partner> Items, int TotalCount)> GetAllAsync(string? search, string? type, bool includeInactive, int page, int pageSize, CancellationToken cancellationToken = default)
     {
         var query = _dbContext.Partners.AsQueryable();
 
@@ -26,16 +26,19 @@ public class PartnerRepository(AppDbContext dbContext) : IPartnerRepository
         if (!string.IsNullOrWhiteSpace(search))
         {
             var searchTerm = search.Trim();
+
+            bool isNumeric = long.TryParse(searchTerm, out _);
+
             query = query.Where(p =>
                 (!string.IsNullOrEmpty(p.Name) && EF.Functions.Like(p.Name, $"%{searchTerm}%")) ||
-                (!string.IsNullOrEmpty(p.TaxNumber) && p.TaxNumber.Contains(searchTerm)));
+                (isNumeric && !string.IsNullOrEmpty(p.TaxNumber) && p.TaxNumber.Contains(searchTerm)));
         }
-
 
         var totalCount = await query.CountAsync(cancellationToken);
 
         var items = await query
             .OrderBy(p => p.Name)
+            .ThenBy(p => p.Id)
             .Skip((page - 1) * pageSize)
             .Take(pageSize)
             .ToListAsync(cancellationToken);
@@ -68,11 +71,6 @@ public class PartnerRepository(AppDbContext dbContext) : IPartnerRepository
     public void Update(Partner partner)
     {
         _dbContext.Partners.Update(partner);
-    }
-
-    public void Delete(Partner partner)
-    {
-        _dbContext.Partners.Remove(partner);
     }
 
     public async Task SaveChangesAsync(CancellationToken cancellationToken = default)
