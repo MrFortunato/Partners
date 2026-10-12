@@ -1,5 +1,6 @@
 ﻿
 using Partners.Application.Mappings;
+using Partners.Application.Pagination;
 using Partners.Domain;
 using Partners.Domain.Interfaces;
 using System.Text.RegularExpressions;
@@ -17,11 +18,21 @@ public class PartnerService(IPartnerRepository repository) : IPartnerService
         return partner is null? null: PartnerMapper.ToDto(partner);
     }
 
-    public async Task<IEnumerable<PartnerDetailsDto>> GetAllAsync(CancellationToken cancellationToken = default)
+    public async Task<PaginatedResult<PartnerDetailsDto>> GetAllAsync(string? search, PartnerType? type, bool includeInactive, int page, int pageSize, CancellationToken cancellationToken = default)
     {
-        var partners = await _repository.GetAllAsync(cancellationToken);
+        string? typeString = type?.ToString();
 
-        return [.. partners.AsEnumerable<Partner>().Select(PartnerMapper.ToDto)];
+        var (partners, totalCount) = await _repository.GetAllAsync(search, typeString, includeInactive, page, pageSize, cancellationToken);
+
+        var items = partners.Select(PartnerMapper.ToDto).ToList();
+
+        return new PaginatedResult<PartnerDetailsDto>
+        {
+            Items = items,
+            TotalCount = totalCount,
+            Page = page,
+            PageSize = pageSize
+        };
     }
 
     public async Task<PartnerDetailsDto> CreateAsync(CreatePartnerDto dto, CancellationToken cancellationToken = default)
@@ -32,12 +43,12 @@ public class PartnerService(IPartnerRepository repository) : IPartnerService
 
         if (!Enum.IsDefined(typeof(PartnerType), dto.Type))
         {
-            throw new ArgumentException("Tipo de parceiro inválido.", nameof(dto.Type));
+            throw new ArgumentException("Tipo de Entidade inválido.", nameof(dto.Type));
         }
 
         if (await _repository.ExistsByTaxNumberAsync(dto.TaxNumber, cancellationToken: cancellationToken))
         {
-            throw new InvalidOperationException("Já existe um parceiro com este número fiscal.");
+            throw new InvalidOperationException("Já existe um Entidade com este número fiscal.");
         }
 
         var partner = new Partner
@@ -64,7 +75,7 @@ public class PartnerService(IPartnerRepository repository) : IPartnerService
         var partner = await _repository.GetByIdAsync(id, cancellationToken);
         if (partner is null)
         {
-            throw new KeyNotFoundException("Parceiro não encontrado.");
+            throw new KeyNotFoundException("Entidade não encontrado.");
         }
 
         if (partner.Version != dto.Version)
@@ -75,13 +86,13 @@ public class PartnerService(IPartnerRepository repository) : IPartnerService
         var cleanedTaxNumber = Regex.Replace(dto.TaxNumber ?? string.Empty, @"\D", "");
         if (cleanedTaxNumber.Length != 9)
         {
-            throw new ArgumentException("O TaxNumber deve conter exatamente 9 dígitos numéricos.");
+            throw new ArgumentException("O número fiscal deve conter exatamente 9 dígitos numéricos.");
         }
 
         var existingPartnerWithTax = await _repository.ExistsByTaxNumberAsync(cleanedTaxNumber, id, cancellationToken);
         if (existingPartnerWithTax)
         {
-            throw new ArgumentException("Já existe outro parceiro registado com este TaxNumber.");
+            throw new ArgumentException("Já existe outra Entidade registado com este número fiscal.");
         }
 
         partner.Name = dto.Name.Trim();
@@ -112,4 +123,6 @@ public class PartnerService(IPartnerRepository repository) : IPartnerService
             throw new ArgumentException("O limite de crédito não pode ter mais de duas casas decimais.");
         }
     }
+
+  
 }

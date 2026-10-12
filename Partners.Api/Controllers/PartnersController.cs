@@ -1,5 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Partners.Api.Pagination;
 using Partners.Application;
+using Partners.Domain;
 
 namespace Partners.Api.Controllers
 {
@@ -11,14 +13,26 @@ namespace Partners.Api.Controllers
 
         // GET: api/partners
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<PartnerDetailsDto>>> GetAll(CancellationToken cancellationToken = default)
+        public async Task<ActionResult<PaginatedResult<PartnerDetailsDto>>> GetPartners(
+             [FromQuery] string? search,
+             [FromQuery] PartnerType? type,
+             [FromQuery] bool includeInactive = false, 
+             [FromQuery] int page = 1,                
+             [FromQuery] int pageSize = 20,        
+             CancellationToken cancellationToken = default)
         {
-            var partners = await _partnerService.GetAllAsync(cancellationToken);
-            return Ok(partners);
+          
+            if (page < 1) page = 1;
+            if (pageSize < 1) pageSize = 1;
+            if (pageSize > 100) pageSize = 100; 
+
+            var result = await _partnerService.GetAllAsync(search, type, includeInactive, page, pageSize, cancellationToken);
+
+            return Ok(result);
         }
 
         // GET: api/partners/{id}
-        [HttpGet("{id}")]
+        [HttpGet("{id:guid}")]
         public async Task<ActionResult<PartnerDetailsDto>> GetById(Guid id, CancellationToken cancellationToken = default)
         {
             var partner = await _partnerService.GetByIdAsync(id, cancellationToken);
@@ -26,7 +40,7 @@ namespace Partners.Api.Controllers
 
             if (partner is null)
             {
-                return NotFound();
+                return NotFound(new { message = "Entidade não encontrado." });
             }
 
             return Ok(partner);

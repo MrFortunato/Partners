@@ -2,7 +2,7 @@
 
 public interface IPartnerRepository
 {
-    Task<IEnumerable<Partner>> GetAllAsync(CancellationToken cancellationToken = default);
+    Task<(IEnumerable<Partner> Items, int TotalCount)> GetAllAsync(string? search, string? type, bool includeInactive, int page, int pageSize, CancellationToken cancellationToken = default);
 
     Task<Partner?> GetByIdAsync(Guid id, CancellationToken cancellationToken = default);
 

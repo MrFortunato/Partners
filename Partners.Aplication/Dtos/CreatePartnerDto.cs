@@ -9,12 +9,12 @@ public class CreatePartnerDto
     [StringLength(100, MinimumLength = 2, ErrorMessage = "O Name deve ter entre 2 e 100 caracteres.")]
     public string Name { get; set; } = string.Empty;
 
-    [Required(ErrorMessage = "O TaxNumber é obrigatório.")]
-    [RegularExpression(@"^\d{9}$", ErrorMessage = "O TaxNumber deve conter exatamente 9 dígitos numéricos.")]
+    [Required(ErrorMessage = "O número fiscal é obrigatório.")]
+    [RegularExpression(@"^\d{9}$", ErrorMessage = "O número fiscal deve conter exatamente 9 dígitos numéricos.")]
     public string TaxNumber { get; set; } = string.Empty;
 
-    [Required(ErrorMessage = "O tipo é obrigatório.")]
-    [EnumDataType(typeof(PartnerType), ErrorMessage = "O tipo deve ser CUSTOMER, SUPPLIER ou BOTH.")]
+    [Required(ErrorMessage = "O tipo de Entidade é obrigatório.")]
+    [EnumDataType(typeof(PartnerType), ErrorMessage = "O tipo de Entidade deve ser CUSTOMER, SUPPLIER ou BOTH.")]
     public PartnerType Type { get; set; }
 
     [EmailAddress(ErrorMessage = "O email fornecido não é válido.")]

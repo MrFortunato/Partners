@@ -68,7 +68,7 @@ public class PartnerServiceCreateTests
 
         // Assert
         await act.Should().ThrowAsync<InvalidOperationException>()
-            .WithMessage("Já existe um parceiro com este número fiscal.");
+            .WithMessage("Já existe um entidade com este número fiscal.");
         _repositoryMock.Verify(r => r.Add(It.IsAny<Partner>()), Times.Never);
     }
 }
