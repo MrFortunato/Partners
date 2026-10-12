@@ -1,4 +1,5 @@
 ﻿
+using AutoMapper;
 using Partners.Application.Exceptions;
 using Partners.Application.Mappings;
 using Partners.Application.Pagination;
@@ -8,15 +9,16 @@ using System.Text.RegularExpressions;
 
 namespace Partners.Application;
 
-public class PartnerService(IPartnerRepository repository) : IPartnerService
+public class PartnerService(IPartnerRepository repository, IMapper mapper) : IPartnerService
 {
     private readonly IPartnerRepository _repository = repository;
+    private readonly IMapper _mapper = mapper;
 
     public async Task<PartnerDetailsDto?> GetByIdAsync(Guid id, CancellationToken cancellationToken = default)
     {
         var partner = await _repository.GetByIdAsync(id, cancellationToken);
 
-        return partner is null? null: PartnerMapper.ToDto(partner);
+        return partner is null ? null: _mapper.Map<PartnerDetailsDto>(partner); ;
     }
 
     public async Task<PaginatedResult<PartnerDetailsDto>> GetAllAsync(string? search, PartnerType? type, bool includeInactive, int page, int pageSize, CancellationToken cancellationToken = default)
@@ -25,7 +27,7 @@ public class PartnerService(IPartnerRepository repository) : IPartnerService
 
         var (partners, totalCount) = await _repository.GetAllAsync(search, typeString, includeInactive, page, pageSize, cancellationToken);
 
-        var items = partners.Select(PartnerMapper.ToDto).ToList();
+        var items = _mapper.Map<List<PartnerDetailsDto>>(partners); ;
 
         return new PaginatedResult<PartnerDetailsDto>
         {
@@ -47,28 +49,26 @@ public class PartnerService(IPartnerRepository repository) : IPartnerService
             throw new ArgumentException("Tipo de Entidade inválido.", nameof(dto.Type));
         }
 
-        if (await _repository.ExistsByTaxNumberAsync(dto.TaxNumber, cancellationToken: cancellationToken))
+        var cleanedTaxNumber = Regex.Replace(dto.TaxNumber ?? string.Empty, @"\D", "");
+
+        if (cleanedTaxNumber.Length != 9)
+        {
+            throw new ArgumentException("O número fiscal deve conter exatamente 9 dígitos numéricos.");
+        }
+
+        if (await _repository.ExistsByTaxNumberAsync(cleanedTaxNumber, cancellationToken: cancellationToken))
         {
             throw new ConflictException("Já existe outra Entidade registado com este número fiscal.");
         }
 
-        var partner = new Partner
-        {
-            Id = Guid.NewGuid(),
-            Name = dto.Name,
-            TaxNumber = dto.TaxNumber,
-            Type = dto.Type.ToString(),
-            Email = dto.Email,
-            CreditLimit = dto.CreditLimit,
-            IsActive = true,
-            Version = 1
-        };
+        var partner = _mapper.Map<Partner>(dto);
+        partner.Id = Guid.NewGuid();
 
         _repository.Add(partner);
 
         await _repository.SaveChangesAsync(cancellationToken);
 
-        return PartnerMapper.ToDto(partner);
+        return _mapper.Map<PartnerDetailsDto>(partner);
     }
 
     public async Task<PartnerDetailsDto?> UpdateAsync(Guid id,UpdatePartnerDto dto, CancellationToken cancellationToken = default)
@@ -107,7 +107,7 @@ public class PartnerService(IPartnerRepository repository) : IPartnerService
 
         await _repository.SaveChangesAsync(cancellationToken);
 
-        return PartnerMapper.ToDto(partner);
+        return _mapper.Map<PartnerDetailsDto>(partner);
     }
 
 
