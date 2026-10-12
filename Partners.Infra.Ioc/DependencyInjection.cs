@@ -1,7 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Partners.Aplication;
 using Partners.Application;
 using Partners.Domain.Interfaces;
 using Partners.Infra.Data;
@@ -17,22 +16,20 @@ namespace Partners.Infra.Ioc
             {
                 throw new InvalidOperationException("Database connection string is not configured.");
             }
+
             services.AddDbContext<AppDbContext>(options =>
             {
                 options.UseSqlServer(connectionString);
             });
+
             return services;
         }
 
         public static IServiceCollection ConfigureRepositoryDependencies(this IServiceCollection services)
         {
-            services.AddScoped(typeof(IPartnerRepository), typeof(PartnerRepository));
-
-            services.AddScoped(typeof(IPartnerService), typeof(PartnerService));
-
-
+            services.AddScoped<IPartnerRepository, PartnerRepository>();
+            services.AddScoped<IPartnerService, PartnerService>();
             return services;
         }
-
     }
 }

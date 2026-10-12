@@ -1,21 +1,15 @@
+using Partners.Api.Middlewares;
 using Partners.Infra.Ioc;
-using System.Text.Json.Serialization;
 
 var builder = WebApplication.CreateBuilder(args);
-
-
-
-
-
-// Add services to the container.
 
 builder.Services.AddControllers()
     .AddJsonOptions(options =>
     {
-        options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
+        options.JsonSerializerOptions.Converters.Add(new System.Text.Json.Serialization.JsonStringEnumConverter());
     });
-// Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
-builder.Services.AddOpenApi();
+
+
 builder.Services.AddSwaggerGen();
 
 builder.Services.AddInfrastructure(builder.Configuration);
@@ -25,14 +19,12 @@ var app = builder.Build();
 
 app.UseMiddleware<ExceptionHandlingMiddleware>();
 
-// Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
-    app.MapOpenApi();
     app.UseSwagger();
-    app.UseSwaggerUI(x => 
-    { 
-        x.DocumentTitle ="Partners Api - v1";
+    app.UseSwaggerUI(x =>
+    {
+        x.DocumentTitle = "Partners Api - v1";
         x.SwaggerEndpoint("/swagger/v1/swagger.json", "Partners Api - v1");
         x.RoutePrefix = string.Empty;
     });
