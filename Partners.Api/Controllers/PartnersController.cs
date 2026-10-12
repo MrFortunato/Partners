@@ -1,8 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Partners.Aplication;
 using Partners.Application;
-
-// For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
 namespace Partners.Api.Controllers
 {
@@ -17,7 +14,6 @@ namespace Partners.Api.Controllers
         public async Task<ActionResult<IEnumerable<PartnerDetailsDto>>> GetAll(CancellationToken cancellationToken = default)
         {
             var partners = await _partnerService.GetAllAsync(cancellationToken);
-
             return Ok(partners);
         }
 
@@ -27,19 +23,19 @@ namespace Partners.Api.Controllers
         {
             var partner = await _partnerService.GetByIdAsync(id, cancellationToken);
 
+
             if (partner is null)
             {
-                throw new KeyNotFoundException("Parceiro não encontrado.");
+                return NotFound();
             }
 
-            return Ok(partner); 
+            return Ok(partner);
         }
 
         // POST: api/partners
         [HttpPost]
         public async Task<ActionResult<PartnerDetailsDto>> Create([FromBody] CreatePartnerDto dto, CancellationToken cancellationToken = default)
         {
-           
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
@@ -49,12 +45,10 @@ namespace Partners.Api.Controllers
 
             return CreatedAtAction(nameof(GetById), new { id = createdPartner.Id }, createdPartner);
         }
-        
 
-        // PUT api/<PartnersController>/5
         // PUT: api/partners/{id}
         [HttpPut("{id}")]
-        public async Task<ActionResult> Update(Guid id, [FromBody] UpdatePartnerDto dto, CancellationToken cancellationToken = default)
+        public async Task<ActionResult<PartnerDetailsDto>> Update(Guid id, [FromBody] UpdatePartnerDto dto, CancellationToken cancellationToken = default)
         {
             if (!ModelState.IsValid)
             {
@@ -65,11 +59,10 @@ namespace Partners.Api.Controllers
 
             if (updatedPartner is null)
             {
-                return NotFound(); 
+                return NotFound();
             }
 
-            return NoContent(); 
+            return Ok(updatedPartner);
         }
-
     }
 }

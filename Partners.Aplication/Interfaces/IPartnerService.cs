@@ -1,7 +1,5 @@
 ﻿
-using Partners.Application;
-
-namespace Partners.Aplication;
+namespace Partners.Application;
 
 public interface IPartnerService
 {
@@ -11,6 +9,5 @@ public interface IPartnerService
 
     Task<PartnerDetailsDto> CreateAsync(CreatePartnerDto dto, CancellationToken cancellationToken = default);
 
-    Task<PartnerDetailsDto?> UpdateAsync(Guid id,UpdatePartnerDto dto, CancellationToken cancellationToken = default);
-
+    Task<PartnerDetailsDto?> UpdateAsync(Guid id, UpdatePartnerDto dto, CancellationToken cancellationToken = default);
 }

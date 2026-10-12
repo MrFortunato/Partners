@@ -14,13 +14,10 @@
     </PackageReference>
   </ItemGroup>
 
+  <!-- Em Arquitetura Limpa, a camada de Infraestrutura só conhece o Domínio.
+       A referência anterior a Partners.Aplication era uma violação da regra de dependências. -->
   <ItemGroup>
-    <ProjectReference Include="..\Partners.Aplication\Partners.Aplication.csproj" />
     <ProjectReference Include="..\Partners.Domain\Partners.Domain.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="Migrations\" />
   </ItemGroup>
 
 </Project>
