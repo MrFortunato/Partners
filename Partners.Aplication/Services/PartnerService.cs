@@ -1,7 +1,6 @@
 ﻿
 using AutoMapper;
 using Partners.Application.Exceptions;
-using Partners.Application.Mappings;
 using Partners.Application.Pagination;
 using Partners.Domain;
 using Partners.Domain.Interfaces;
