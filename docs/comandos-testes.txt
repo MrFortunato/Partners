@@ -1,0 +1,290 @@
+================================================================================
+ GUIA DE COMANDOS PARA TESTES - Partners API
+ =================================================================================
+ Projeto: Partners (.NET 10)
+ Tipos de testes: Unitários + E2E
+ Total: unitários + E2E
+================================================================================
+
+
+--------------------------------------------------------------------------------
+ 1. PRÉ-REQUISITOS (executar uma vez antes dos testes)
+--------------------------------------------------------------------------------
+
+# Restaurar dependências
+dotnet restore Partners.slnx
+
+# Compilar a solução (verifica que tudo está OK)
+dotnet build Partners.slnx
+
+
+--------------------------------------------------------------------------------
+ 2. COMANDOS BÁSICOS - CORRER TESTES
+--------------------------------------------------------------------------------
+
+# Correr TODOS os testes (unitários + E2E)
+dotnet test Partners.slnx
+
+# Correr apenas os unitários da camada de Aplicação (6 testes)
+dotnet test Partners.Aplication.Tests
+
+# Correr apenas os unitários da camada de API (3 testes)
+dotnet test Partners.Api.Tests
+
+# Correr apenas os testes E2E (3 testes)
+dotnet test Partners.E2E.Tests
+
+
+--------------------------------------------------------------------------------
+ 3. NÍVEIS DE VERBOSIDADE (quanto detalhe ver na consola)
+--------------------------------------------------------------------------------
+
+# Verbosidade detalhada (vê cada teste a passar/falhar)
+dotnet test Partners.slnx --logger "console;verbosity=detailed"
+
+# Verbosidade normal (resumo por projeto)
+dotnet test Partners.slnx --verbosity normal
+
+# Verbosidade mínima (só os testes que falharam)
+dotnet test Partners.slnx --verbosity minimal
+
+# Verbosidade silenciosa (só o resultado final)
+dotnet test Partners.slnx --verbosity quiet
+
+
+--------------------------------------------------------------------------------
+ 4. FILTRAR TESTES ESPECÍFICOS
+--------------------------------------------------------------------------------
+
+# --- Por método do serviço (Aplication.Tests) ---
+
+# Só os testes do Create
+dotnet test Partners.Aplication.Tests --filter "FullyQualifiedName~Create"
+
+# Só os testes do Update
+dotnet test Partners.Aplication.Tests --filter "FullyQualifiedName~Update"
+
+# Só os testes do GetById
+dotnet test Partners.Aplication.Tests --filter "FullyQualifiedName~GetById"
+
+# Só os testes do GetAll
+dotnet test Partners.Aplication.Tests --filter "FullyQualifiedName~GetAll"
+
+# --- Por nome exato do teste ---
+
+dotnet test Partners.Aplication.Tests --filter "Name=CreateAsync_WithValidDto_ShouldCreatePartnerAndReturnDto"
+
+# --- Por endpoint HTTP (E2E.Tests) ---
+
+# Só os testes de POST (criar)
+dotnet test Partners.E2E.Tests --filter "FullyQualifiedName~POST"
+
+# Só os testes de GET (obter/listar)
+dotnet test Partners.E2E.Tests --filter "FullyQualifiedName~GET"
+
+# Só os testes de PUT (atualizar)
+dotnet test Partners.E2E.Tests --filter "FullyQualifiedName~PUT"
+
+# Só o teste do ciclo de vida completo
+dotnet test Partners.E2E.Tests --filter "FullyQualifiedName~FullLifecycle"
+
+
+--------------------------------------------------------------------------------
+ 5. COBERTURA DE CÓDIGO (code coverage)
+--------------------------------------------------------------------------------
+
+# Gerar relatório de cobertura (formato cobertura.xml)
+dotnet test Partners.slnx --collect:"XPlat Code Coverage"
+
+# Especificar pasta de resultados
+dotnet test Partners.slnx --collect:"XPlat Code Coverage" --results-directory ./TestResults
+
+# Gerar relatório HTML legível (precisa de instalar o reportgenerator)
+dotnet tool install -g dotnet-reportgenerator-globaltool
+reportgenerator -reports:"**/TestResults/**/coverage.cobertura.xml" -targetdir:"TestResults/Report" -reporttypes:Html
+
+# Abrir o relatório no browser
+start TestResults/Report/index.html
+
+
+--------------------------------------------------------------------------------
+ 6. BUILD + TEST COMBINADOS (mais eficiente)
+--------------------------------------------------------------------------------
+
+# Build + test em modo Release (como o CI faz)
+dotnet test Partners.slnx --configuration Release
+
+# Sem recompilar (mais rápido, se já fizeste build antes)
+dotnet test Partners.slnx --no-build
+
+# Sem restaurar (se já fizeste restore antes)
+dotnet test Partners.slnx --no-restore
+
+# Tudo junto (build + test sem restore)
+dotnet build Partners.slnx
+dotnet test Partners.slnx --no-build
+
+# Comando único: restore + build + test
+dotnet restore Partners.slnx; dotnet build Partners.slnx; dotnet test Partners.slnx --no-build
+
+
+--------------------------------------------------------------------------------
+ 7. RESULTADOS EM FICHEIRO (formato TRX para Visual Studio / Azure DevOps)
+--------------------------------------------------------------------------------
+
+# Gerar ficheiro TRX
+dotnet test Partners.slnx --logger "trx;LogFileName=test-results.trx"
+
+# Os ficheiros ficam em:
+#   Partners.Aplication.Tests/TestResults/<guid>/test-results.trx
+#   Partners.Api.Tests/TestResults/<guid>/test-results.trx
+#   Partners.E2E.Tests/TestResults/<guid>/test-results.trx
+
+# Combinar TRX com cobertura
+dotnet test Partners.slnx --logger "trx;LogFileName=test-results.trx" --collect:"XPlat Code Coverage"
+
+
+--------------------------------------------------------------------------------
+ 8. COMANDOS PARA DEBUG E DETEÇÃO DE FLAKY TESTS
+--------------------------------------------------------------------------------
+
+# Listar todos os testes sem os executar
+dotnet test Partners.slnx --list-tests
+
+# Parar no primeiro teste que falha (blame)
+dotnet test Partners.slnx --blame
+
+# Detetar flaky tests (testes que falham aleatoriamente) - repete os testes
+dotnet test Partners.slnx --blame-hang --blame-hang-timeout 30s
+
+# Correr testes em paralelo (mais rápido)
+dotnet test Partners.slnx --parallel
+
+
+--------------------------------------------------------------------------------
+ 9. WORKFLOW RECOMENDADO (dia-a-dia)
+--------------------------------------------------------------------------------
+
+# === PASSO 1: Antes de começar a programar ===
+# Garantir que está tudo verde
+dotnet build Partners.slnx
+dotnet test Partners.slnx --no-build
+
+# === PASSO 2: Enquanto programas ===
+# Correr só unitários (rápidos, milissegundos)
+dotnet test Partners.Aplication.Tests --no-build
+dotnet test Partners.Api.Tests --no-build
+
+# === PASSO 3: Antes de fazer commit ===
+# Correr tudo incluindo E2E
+dotnet test Partners.slnx
+
+# === PASSO 4: Para ver cobertura de código ===
+dotnet test Partners.slnx --collect:"XPlat Code Coverage"
+
+
+--------------------------------------------------------------------------------
+ 10. RESUMO RÁPIDO (copia e cola)
+--------------------------------------------------------------------------------
+
+# Tudo de uma vez
+dotnet restore Partners.slnx; dotnet build Partners.slnx; dotnet test Partners.slnx --verbosity normal
+
+# Só unitários (rápidos)
+dotnet test Partners.Aplication.Tests
+dotnet test Partners.Api.Tests
+
+# Só E2E
+dotnet test Partners.E2E.Tests
+
+# Tudo com detalhe
+dotnet test Partners.slnx --logger "console;verbosity=detailed"
+
+# Com cobertura
+dotnet test Partners.slnx --collect:"XPlat Code Coverage"
+
+
+--------------------------------------------------------------------------------
+ 11. ATALHOS DE TECLADO (Visual Studio / Cursor)
+--------------------------------------------------------------------------------
+
+Ctrl+R, T        -> Correr teste sob o cursor
+Ctrl+R, Ctrl+T   -> Debug teste sob o cursor
+Ctrl+R, A        -> Correr todos os testes
+Ctrl+R, Ctrl+A   -> Debug todos os testes
+Ctrl+R, L        -> Abrir a Lista de Testes (Test Explorer)
+
+
+--------------------------------------------------------------------------------
+ 12. OUTPUT ESPERADO
+--------------------------------------------------------------------------------
+
+Quando tudo passa:
+  Passed!  - Failed: 0, Passed: 12, Skipped: 0, Total: 12
+    Partners.Aplication.Tests: Passed: 6
+    Partners.Api.Tests:        Passed: 3
+    Partners.E2E.Tests:        Passed: 3
+
+Quando algum falha:
+  Failed!  - Failed: 1, Passed: 11, Skipped: 0, Total: 12
+    Partners.E2E.Tests: Failed: 1
+      x FullLifecycle_Create_Update_Get_ShouldPersistChanges [500ms]
+        Error: Expected status OK, got NotFound
+
+
+--------------------------------------------------------------------------------
+ 13. ESTRUTURA DOS PROJETOS DE TESTE
+--------------------------------------------------------------------------------
+
+tests/
+|
++-- Partners.Aplication.Tests/         (UNITARIOS - camada de Aplicacao)
+|   +-- Services/
+|   |   +-- PartnerServiceCreateTests.cs
+|   |   +-- PartnerServiceGetTests.cs      
+|   |   +-- PartnerServiceUpdateTests.cs   
+|   +-- TestData/PartnerTestData.cs
+|
++-- Partners.Api.Tests/                (UNITARIOS - camada de API)
+|   +-- Controllers/PartnersControllerTests.cs       
+|   +-- Middlewares/ExceptionHandlingMiddlewareTests.cs 
+|
++-- Partners.E2E.Tests/                (E2E - pipeline HTTP completo)
+    +-- Infrastructure/PartnersWebAppFactory.cs
+    +-- Models/PartnerResponse.cs
+    +-- Endpoints/PartnersEndpointsTests.cs         
+
+
+--------------------------------------------------------------------------------
+ 14. TIPOS DE TESTE NO PROJETO
+--------------------------------------------------------------------------------
+
+UNITARIOS:
+  - Isolam dependencias com mocks (Moq)
+  - Muito rapidos (milissegundos)
+  - Validam regras de negocio e comportamento de controllers
+
+E2E:
+  - Arrancam a API real em memoria (WebApplicationFactory)
+  - Fazem chamadas HTTP reais
+  - Substituem SQL Server por EF Core InMemory
+  - Validam o pipeline completo: HTTP -> Controller -> Service -> Repository -> BD
+
+
+--------------------------------------------------------------------------------
+ 15. PACOTES USADOS NOS TESTES
+--------------------------------------------------------------------------------
+
+xunit                           -> Framework de testes
+xunit.runner.visualstudio       -> Runner do Visual Studio
+Microsoft.NET.Test.Sdk          -> SDK de testes da Microsoft
+Moq                             -> Biblioteca de mocks
+FluentAssertions                -> Assercoes fluentes (result.Should().Be(...))
+Microsoft.AspNetCore.Mvc.Testing -> WebApplicationFactory (E2E)
+Microsoft.EntityFrameworkCore.InMemory -> BD em memoria (E2E)
+System.Net.Http.Json            -> Serializacao JSON em pedidos HTTP (E2E)
+
+
+================================================================================
+ FIM DO GUIA
+================================================================================

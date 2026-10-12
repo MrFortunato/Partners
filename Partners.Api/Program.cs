@@ -37,3 +37,6 @@ app.UseAuthorization();
 app.MapControllers();
 
 app.Run();
+
+// Necessário para o WebApplicationFactory<Program> aceder ao entry point nos testes E2E.
+public partial class Program { }

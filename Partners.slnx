@@ -10,5 +10,9 @@
     <Project Path="Partners.Infra.Data/Partners.Infra.Data.csproj" />
     <Project Path="Partners.Infra.Ioc/Partners.Infra.Ioc.csproj" />
   </Folder>
-  <Folder Name="/tests/" />
+  <Folder Name="/tests/">
+    <Project Path="Partners.Aplication.Tests/Partners.Aplication.Tests.csproj" />
+    <Project Path="Partners.Api.Tests/Partners.Api.Tests.csproj" />
+    <Project Path="Partners.E2E.Tests/Partners.E2E.Tests.csproj" />
+  </Folder>
 </Solution>

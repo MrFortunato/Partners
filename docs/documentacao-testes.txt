@@ -1,0 +1,41 @@
+================================================================================
+ DOCUMENTACAO DOS TESTES - Partners API
+ =================================================================================
+ Projeto: Partners (.NET 10)
+ testes: unitarios + 3 E2E
+
+--------------------------------------------------------------------------------
+ ESTRUTURA DOS PROJETOS DE TESTE
+--------------------------------------------------------------------------------
+
+tests/
++-- Partners.Aplication.Tests/
+|   +-- TestData/PartnerTestData.cs
+|   +-- Services/
+|       +-- PartnerServiceCreateTests.cs   
+|       +-- PartnerServiceGetTests.cs       
+|       +-- PartnerServiceUpdateTests.cs    
+|
++-- Partners.Api.Tests/
+|   +-- Controllers/PartnersControllerTests.cs        
+|   +-- Middlewares/ExceptionHandlingMiddlewareTests.cs
++-- Partners.E2E.Tests/
+    +-- Infrastructure/PartnersWebAppFactory.cs
+    +-- Models/PartnerResponse.cs
+    +-- Endpoints/PartnersEndpointsTests.cs     
+
+
+--------------------------------------------------------------------------------
+ PACOTES NUGET USADOS
+--------------------------------------------------------------------------------
+
+xunit 2.9.0                          - Framework de testes (todos)
+xunit.runner.visualstudio 2.8.2      - Runner do Visual Studio (todos)
+Microsoft.NET.Test.Sdk 17.11.0        - SDK de testes (todos)
+Moq 4.20.70                          - Mocks (Aplication, Api)
+FluentAssertions 6.12.0              - Assercoes fluentes (todos)
+Microsoft.AspNetCore.Mvc.Testing    - WebApplicationFactory (E2E)
+Microsoft.EntityFrameworkCore.InMemory - BD em memoria (E2E)
+System.Net.Http.Json                 - Serializacao JSON HTTP (E2E)
+
+
