@@ -1,6 +1,8 @@
 ﻿using System.Net;
 using System.Text.Json;
 
+namespace Partners.Api.Middlewares;
+
 public class ExceptionHandlingMiddleware
 {
     private readonly RequestDelegate _next;
@@ -16,7 +18,6 @@ public class ExceptionHandlingMiddleware
     {
         try
         {
-  
             await _next(context);
         }
         catch (Exception ex)
@@ -30,14 +31,13 @@ public class ExceptionHandlingMiddleware
     {
         context.Response.ContentType = "application/json";
 
-        var statusCode = HttpStatusCode.InternalServerError; 
-        var message = "Ocorreu um erro interno no servidor.";
-
-        if (exception is ArgumentException || exception is InvalidOperationException)
+        var (statusCode, message) = exception switch
         {
-            statusCode = HttpStatusCode.BadRequest;
-            message = exception.Message; 
-        }
+            KeyNotFoundException => (HttpStatusCode.NotFound, exception.Message),
+            ArgumentException => (HttpStatusCode.BadRequest, exception.Message),
+            InvalidOperationException => (HttpStatusCode.BadRequest, exception.Message),
+            _ => (HttpStatusCode.InternalServerError, "Ocorreu um erro interno no servidor.")
+        };
 
         context.Response.StatusCode = (int)statusCode;
 
