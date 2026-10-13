@@ -1,5 +1,8 @@
 <Solution>
-  <Folder Name="/docs/" />
+  <Folder Name="/docs/">
+    <File Path="C:/Users/PC/Downloads/comandos-testes.txt" />
+    <File Path="C:/Users/PC/Downloads/documentacao-testes.txt" />
+  </Folder>
   <Folder Name="/Itens de Solução/">
     <File Path=".gitignore" />
   </Folder>
@@ -11,8 +14,8 @@
     <Project Path="Partners.Infra.Ioc/Partners.Infra.Ioc.csproj" />
   </Folder>
   <Folder Name="/tests/">
-    <Project Path="Partners.Aplication.Tests/Partners.Aplication.Tests.csproj" />
     <Project Path="Partners.Api.Tests/Partners.Api.Tests.csproj" />
+    <Project Path="Partners.Aplication.Tests/Partners.Aplication.Tests.csproj" />
     <Project Path="Partners.E2E.Tests/Partners.E2E.Tests.csproj" />
   </Folder>
 </Solution>
