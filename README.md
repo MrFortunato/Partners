@@ -177,8 +177,4 @@ dotnet test Partners.E2E.Tests
 
 Ver `docs/comandos-testes.txt` e `docs/documentacao-testes.txt` para detalhes.
 
----
 
-## CI
-
-Pipeline em `.github/workflows/tests.yml` corre os 12 testes automaticamente em push/PR para `main` e `develop`.
