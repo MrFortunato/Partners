@@ -138,7 +138,7 @@ Partners.Infra.Ioc    -> Partners.Aplication, Partners.Domain, Partners.Infra.Da
 
 ### Pré-requisitos
 - .NET 10 SDK
-- SQL Server (local ou Docker)
+- SQL Server (local)
 
 ### Passos
 ```bash
