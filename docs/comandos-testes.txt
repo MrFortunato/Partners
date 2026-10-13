@@ -1,0 +1,10 @@
+================================================================================
+ COMANDOS TESTES - Partners API
+================================================================================
+
+dotnet test Partners.slnx                    # todos os 12 testes
+dotnet test Partners.Aplication.Tests         # 6 unitarios (Service)
+dotnet test Partners.Api.Tests                # 3 unitarios (Controller + Middleware)
+dotnet test Partners.E2E.Tests               # 3 E2E (pipeline HTTP)
+dotnet test Partners.slnx --collect:"XPlat Code Coverage"  # com cobertura
+================================================================================

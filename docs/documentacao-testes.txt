@@ -1,0 +1,39 @@
+================================================================================
+ TESTES - Partners API | 12 testes (9 unitarios + 3 E2E)
+================================================================================
+
+UNITARIOS (9)
+  Aplication.Tests (6) - PartnerService com mock do repository + IMapper:
+    1. Create caminho feliz
+    2. Create TaxNumber duplicado -> ConflictException
+    3. GetById existe
+    4. Update + incrementa versao
+    5. Update parceiro inexistente -> KeyNotFoundException
+    6. Update versao errada -> ConflictException (concorrencia otimista)
+
+  Api.Tests (3) - Controller + Middleware com mock do service:
+    7. GetById existe -> 200 OK
+    8. GetById nao existe -> 404
+    9. Middleware (Theory): ArgumentException/InvalidOperation -> 400,
+       KeyNotFound -> 404, ConflictException -> 409
+
+E2E (3) - pipeline HTTP completo, sem mocks (WebApplicationFactory + InMemory):
+   10. POST /api/partners -> 201 Created
+   11. GET  /api/partners/{id} -> 200 OK
+   12. POST -> PUT -> GET (valida persistencia)
+
+COMANDOS
+  dotnet test Partners.slnx              # todos
+  dotnet test Partners.Aplication.Tests   # 6 unitarios
+  dotnet test Partners.Api.Tests          # 3 unitarios
+  dotnet test Partners.E2E.Tests         # 3 E2E
+
+PACOTES: xunit, Moq, FluentAssertions, AutoMapper, Mvc.Testing, EFCore.InMemory
+CI: .github/workflows/tests.yml (corre em push/PR para main e develop)
+
+EXCECOES E CODIGOS HTTP
+  ArgumentException          -> 400 BadRequest
+  InvalidOperationException  -> 400 BadRequest
+  KeyNotFoundException       -> 404 NotFound
+  ConflictException          -> 409 Conflict
+================================================================================

@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using Moq;
 using Partners.Api.Middlewares;
+using Partners.Application.Exceptions;
 using Xunit;
 
 namespace Partners.Api.Tests.Middlewares;
@@ -16,6 +17,7 @@ public class ExceptionHandlingMiddlewareTests
     [InlineData(typeof(ArgumentException), HttpStatusCode.BadRequest)]
     [InlineData(typeof(InvalidOperationException), HttpStatusCode.BadRequest)]
     [InlineData(typeof(KeyNotFoundException), HttpStatusCode.NotFound)]
+    [InlineData(typeof(ConflictException), HttpStatusCode.Conflict)]
     public async Task InvokeAsync_WhenExceptionIsThrown_ShouldReturnExpectedStatusCode(Type exceptionType, HttpStatusCode expectedStatusCode)
     {
         // Arrange

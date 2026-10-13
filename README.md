@@ -1,106 +1,184 @@
-# \# Partners API
+# Partners API
 
-# 
+API RESTful em .NET 10 para gestão de parceiros de negócio (clientes, fornecedores), construída com **Clean Architecture**, **AutoMapper**, **EF Core** e **Injeção de Dependências**.
 
-# API RESTful desenvolvida em .NET para a gestão de parceiros de negócio (clientes, fornecedores, etc.), construída com princípios de Clean Architecture, Injeção de Dependências (IoC) e Entity Framework Core.
+---
 
-# 
+## Arquitetura
 
-# \---
+```
+Partners.Api          -> Controllers, Middlewares (presentation)
+Partners.Aplication   -> Services, DTOs, Mappings, Exceptions (regras de negócio)
+Partners.Domain       -> Entidades, Enums, Interfaces de Repositório
+Partners.Infra.Data   -> DbContext, Repositórios, Migrations (persistência)
+Partners.Infra.Ioc    -> Composition Root (DI)
+```
 
-# 
+**Regra de dependências:** Domínio não conhece ninguém; Aplicação conhece Domínio; Infraestrutura conhece Domínio; API conhece Aplicação. A Composition Root (Ioc) conhece tudo.
 
-# \## Arquitetura do Projeto
+---
 
-# 
+## Tecnologias
 
-# O projeto está organizado em camadas para garantir o desacoplamento, testabilidade e facilidade de manutenção:
+- .NET 10 (C#)
+- EF Core 10 + SQL Server
+- AutoMapper 16 (mapeamento DTO ↔ Entidade)
+- Swagger (documentação interativa)
+- xUnit + Moq + FluentAssertions (testes)
 
-# 
+---
 
-# \- Partners.Api: Camada de apresentação contendo os Controllers, middlewares e configurações da API.
+## Bibliotecas (NuGet)
 
-# \- Partners.Aplication: Contém as regras de negócio da aplicação, DTOs (CreatePartnerDto, UpdatePartnerDto, PartnerDetailsDto), Mappers e Interfaces/Implementações dos Serviços (IPartnerService).
+### Código de produção
 
-# \- Partners.Domain: Camada central do sistema. Contém as Entidades do domínio (Partner), Enums (PartnerType) e Interfaces dos Repositórios (IPartnerRepository).
+| Pacote | Versão | Projeto | Função |
+|-------|--------|---------|--------|
+| `Microsoft.AspNetCore.OpenApi` | 10.0.12 | Api | Documentação OpenAPI |
+| `Swashbuckle.AspNetCore` | 10.3.0 | Api | UI do Swagger |
+| `Microsoft.EntityFrameworkCore.Design` | 10.0.12 | Api | Design-time do EF (migrations) |
+| `AutoMapper` | 16.2.0 | Aplication | Mapeamento automático DTO ↔ Entidade |
+| `Microsoft.EntityFrameworkCore.SqlServer` | 10.0.12 | Infra.Data | Provider SQL Server do EF Core |
+| `Microsoft.EntityFrameworkCore.Tools` | 10.0.12 | Infra.Data | CLI do EF (dotnet ef) |
 
-# \- Partners.Infra.Data: Implementação do acesso a dados, mapeamentos do EF Core, DbContext e repositórios.
+### Testes
 
-# \- Partners.Infra.Ioc: Contentor de Injeção de Dependências encarregue de registar os serviços e repositórios no Program.cs.
+| Pacote | Versão | Projetos | Função |
+|-------|--------|---------|--------|
+| `xunit` | 2.9.0 | todos os testes | Framework de testes |
+| `xunit.runner.visualstudio` | 2.8.2 | todos os testes | Runner do Visual Studio |
+| `Microsoft.NET.Test.Sdk` | 17.11.0 | todos os testes | SDK de testes |
+| `Moq` | 4.20.70 | Aplication.Tests, Api.Tests | Mocking de dependências |
+| `FluentAssertions` | 6.12.0 | todos os testes | Asserções fluentes |
+| `Microsoft.AspNetCore.Mvc.Testing` | 10.0.12 | E2E.Tests | WebApplicationFactory |
+| `Microsoft.EntityFrameworkCore.InMemory` | 10.0.12 | E2E.Tests | BD em memória para testes |
 
-# 
+### Referências entre projetos
 
-# \---
+```
+Partners.Api          -> Partners.Aplication, Partners.Infra.Ioc
+Partners.Aplication   -> Partners.Domain
+Partners.Infra.Data   -> Partners.Domain
+Partners.Infra.Ioc    -> Partners.Aplication, Partners.Domain, Partners.Infra.Data
+```
 
-# 
+> O `Partners.Domain` não referencia nenhum projeto nem pacote NuGet — é a camada mais isolada (princípio da Arquitetura Limpa).
 
-# \## Tecnologias e Ferramentas
+---
 
-# 
+## Endpoints
 
-# \- .NET SDK (C#)
+| Método | Rota | Status | Descrição |
+|--------|------|--------|-----------|
+| GET | `/api/partners` | 200 | Lista paginada com filtros |
+| GET | `/api/partners/{id}` | 200 / 404 | Obter por ID |
+| POST | `/api/partners` | 201 / 400 / 409 | Criar |
+| PUT | `/api/partners/{id}` | 200 / 404 / 409 | Atualizar |
 
-# \- Entity Framework Core (Acesso a dados e Migrations)
+### GET /api/partners — Query parameters
 
-# \- OpenAPI / Swagger (Documentação interativa da API)
+| Parâmetro | Tipo | Default | Descrição |
+|-----------|------|---------|----------|
+| `search` | string? | null | Pesquisa por Name (LIKE) ou TaxNumber (se numérico) |
+| `type` | PartnerType? | null | CUSTOMER, SUPPLIER ou BOTH |
+| `includeInactive` | bool | false | Incluir inativos |
+| `page` | int | 1 | Página (min 1) |
+| `pageSize` | int | 20 | Itens por página (1-100) |
 
-# \- SQL Server (Base de dados relacional)
+**Resposta:** `PaginatedResult<PartnerDetailsDto>`
+```json
+{
+  "items": [ { "id": "...", "name": "Acme", ... } ],
+  "totalCount": 42,
+  "page": 1,
+  "pageSize": 20
+}
+```
 
-# 
+### POST /api/partners — Body
+```json
+{
+  "name": "Acme Lda",
+  "taxNumber": "123456789",
+  "type": "CUSTOMER",
+  "email": "contact@acme.ao",
+  "creditLimit": 5000.00
+}
+```
 
-# \---
+### PUT /api/partners/{id} — Body
+```json
+{
+  "name": "Acme Updated",
+  "taxNumber": "987654321",
+  "type": "SUPPLIER",
+  "email": "new@acme.ao",
+  "creditLimit": 7500.00,
+  "isActive": false,
+  "version": 1
+}
+```
 
-# 
+> O campo `version` é obrigatório para concorrência otimista. Se não corresponder à versão atual, devolve **409 Conflict**.
 
-# \## Endpoints da API (/api/partners)
+---
 
-# 
+## Códigos de erro
 
-# A API expõe as seguintes rotas RESTful para a entidade Partners:
+| Código | Exceção | Cenário |
+|--------|---------|---------|
+| 400 | `ArgumentException` | Validação de input |
+| 404 | `KeyNotFoundException` | Recurso não encontrado |
+| 409 | `ConflictException` | TaxNumber duplicado ou versão desatualizada |
+| 500 | (outras) | Erro interno |
 
-# 
+---
 
-# \- GET /api/partners: Obtém a lista completa de parceiros (200 OK)
+## Como executar
 
-# \- GET /api/partners/{id}: Obtém os detalhes de um parceiro por ID (200 OK / 404 Not Found)
+### Pré-requisitos
+- .NET 10 SDK
+- SQL Server (local ou Docker)
 
-# \- POST /api/partners: Regista um novo parceiro (201 Created / 400 Bad Request)
+### Passos
+```bash
+# 1. Restaurar dependências
+dotnet restore Partners.slnx
 
-# \- PUT /api/partners/{id}: Atualiza os dados de um parceiro existente (204 No Content / 404 Not Found)
+# 2. Configurar connection string em Partners.Api/appsettings.json
 
-# \- DELETE /api/partners/{id}: Elimina um parceiro por ID (204 No Content / 404 Not Found)
+# 3. Aplicar migrations
+dotnet ef database update --project Partners.Infra.Data --startup-project Partners.Api
 
-# 
+# 4. Executar a API
+dotnet run --project Partners.Api
 
-# \---
+# 5. Abrir Swagger
+# http://localhost:5000  (ou a porta indicada)
+```
 
-# 
+---
 
-# \## Como Executar o Projeto
+## Testes
 
-# 
+12 testes automatizados (9 unitários + 3 E2E).
 
-# \### Pré-requisitos
+```bash
+# Correr todos
+dotnet test Partners.slnx
 
-# \- .NET SDK
+# Apenas unitários
+dotnet test Partners.Aplication.Tests
+dotnet test Partners.Api.Tests
 
-# \- Instância do SQL Server a correr localmente ou num contentor Docker.
+# Apenas E2E
+dotnet test Partners.E2E.Tests
+```
 
-# 
+Ver `docs/comandos-testes.txt` e `docs/documentacao-testes.txt` para detalhes.
 
-# \### Passo a Passo
+---
 
-# 1\. Clonar o repositório e aceder à pasta do projeto.
+## CI
 
-# 2\. Configurar a Connection String no appsettings.json da pasta Partners.Api.
-
-# 3\. Aplicar as Migrations:
-
-# &#x20;  dotnet ef database update --project Partners.Infra.Data --startup-project Partners.Api
-
-# 4\. Executar a API:
-
-# &#x20;  dotnet run --project Partners.Api
-
-# 5\. Aceder ao Swagger no navegador para testar os endpoints.
-
+Pipeline em `.github/workflows/tests.yml` corre os 12 testes automaticamente em push/PR para `main` e `develop`.

@@ -1,0 +1,53 @@
+================================================================================
+ BIBLIOTECAS (NUGET) - Partners API
+================================================================================
+
+--- PRODUCAO -------------------------------------------------------------------
+
+Pacote                                          | Versao  | Projeto
+------------------------------------------------+---------+----------------
+Microsoft.AspNetCore.OpenApi                    | 10.0.12 | Api
+Swashbble.AspNetCore                            | 10.3.0  | Api
+Microsoft.EntityFrameworkCore.Design             | 10.0.12 | Api
+AutoMapper                                      | 16.2.0  | Aplication
+Microsoft.EntityFrameworkCore.SqlServer          | 10.0.12 | Infra.Data
+Microsoft.EntityFrameworkCore.Tools              | 10.0.12 | Infra.Data
+
+Partners.Domain: nenhum pacote NuGet (camada isolada)
+Partners.Infra.Ioc: nenhum pacote NuGet (so ProjectReferences)
+
+
+--- TESTES ---------------------------------------------------------------------
+
+Pacote                                          | Versao  | Projetos
+------------------------------------------------+---------+----------------
+xunit                                          | 2.9.0   | todos
+xunit.runner.visualstudio                      | 2.8.2   | todos
+Microsoft.NET.Test.Sdk                         | 17.11.0 | todos
+Moq                                            | 4.20.70 | Aplication.Tests, Api.Tests
+FluentAssertions                               | 6.12.0  | todos
+Microsoft.AspNetCore.Mvc.Testing              | 10.0.12 | E2E.Tests
+Microsoft.EntityFrameworkCore.InMemory         | 10.0.12 | E2E.Tests
+
+
+--- REFERENCIAS ENTRE PROJETOS -------------------------------------------------
+
+Partners.Api          -> Aplication, Infra.Ioc
+Partners.Aplication   -> Domain
+Partners.Infra.Data   -> Domain
+Partners.Infra.Ioc    -> Aplication, Domain, Infra.Data
+
+Domain: nao referencia ninguem (centro da Arquitetura Limpa)
+
+
+--- DESCRICAO DAS BIBLIOTECAS PRINCIPAIS ---------------------------------------
+
+AutoMapper          Mapeia automaticamente DTO <-> Entidade (MappingProfile)
+EF Core SqlServer   Provider do Entity Framework para SQL Server
+EF Core InMemory    BD em memoria para testes (sem precisar de SQL Server)
+Swashbuckle         Gera a UI do Swagger em /swagger
+xunit               Framework de testes ([Fact], [Theory], [InlineData])
+Moq                 Cria mocks de interfaces (IPartnerRepository, IPartnerService)
+FluentAssertions    Assercoes legiveis: result.Should().Be(...)
+Mvc.Testing        WebApplicationFactory<Program> arranca a API em memoria
+================================================================================

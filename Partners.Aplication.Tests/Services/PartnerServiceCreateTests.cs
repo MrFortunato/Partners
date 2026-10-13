@@ -1,6 +1,8 @@
+using AutoMapper;
 using FluentAssertions;
 using Moq;
 using Partners.Application;
+using Partners.Application.Exceptions;
 using Partners.Domain;
 using Partners.Domain.Interfaces;
 using Partners.Aplication.Tests.TestData;
@@ -11,12 +13,14 @@ namespace Partners.Aplication.Tests.Services;
 public class PartnerServiceCreateTests
 {
     private readonly Mock<IPartnerRepository> _repositoryMock;
+    private readonly Mock<IMapper> _mapperMock;
     private readonly PartnerService _sut;
 
     public PartnerServiceCreateTests()
     {
         _repositoryMock = new Mock<IPartnerRepository>();
-        _sut = new PartnerService(_repositoryMock.Object);
+        _mapperMock = new Mock<IMapper>();
+        _sut = new PartnerService(_repositoryMock.Object, _mapperMock.Object);
     }
 
     [Fact]
@@ -32,9 +36,15 @@ public class PartnerServiceCreateTests
             CreditLimit = PartnerTestData.ValidCreditLimit
         };
 
+        var partner = PartnerTestData.BuildPartner(name: dto.Name, type: PartnerType.BOTH);
+        var expectedDto = new PartnerDetailsDto { Id = partner.Id, Name = dto.Name, Type = PartnerType.BOTH };
+
         _repositoryMock
             .Setup(r => r.ExistsByTaxNumberAsync(dto.TaxNumber, null, It.IsAny<CancellationToken>()))
             .ReturnsAsync(false);
+
+        _mapperMock.Setup(m => m.Map<Partner>(dto)).Returns(partner);
+        _mapperMock.Setup(m => m.Map<PartnerDetailsDto>(partner)).Returns(expectedDto);
 
         // Act
         var result = await _sut.CreateAsync(dto);
@@ -48,7 +58,7 @@ public class PartnerServiceCreateTests
     }
 
     [Fact]
-    public async Task CreateAsync_WhenTaxNumberAlreadyExists_ShouldThrowInvalidOperationException()
+    public async Task CreateAsync_WhenTaxNumberAlreadyExists_ShouldThrowConflictException()
     {
         // Arrange
         var dto = new CreatePartnerDto
@@ -66,9 +76,7 @@ public class PartnerServiceCreateTests
         // Act
         var act = async () => await _sut.CreateAsync(dto);
 
-        // Assert
-        await act.Should().ThrowAsync<InvalidOperationException>()
-            .WithMessage("Já existe um entidade com este número fiscal.");
+        await act.Should().ThrowAsync<ConflictException>();
         _repositoryMock.Verify(r => r.Add(It.IsAny<Partner>()), Times.Never);
     }
 }

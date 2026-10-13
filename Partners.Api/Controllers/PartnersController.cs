@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Partners.Api.Pagination;
 using Partners.Application;
+using Partners.Application.Pagination;
 using Partners.Domain;
 
 namespace Partners.Api.Controllers

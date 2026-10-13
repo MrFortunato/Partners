@@ -1,5 +1,4 @@
-﻿
-using AutoMapper;
+﻿using AutoMapper;
 using Partners.Application.Exceptions;
 using Partners.Application.Pagination;
 using Partners.Domain;
@@ -17,7 +16,7 @@ public class PartnerService(IPartnerRepository repository, IMapper mapper) : IPa
     {
         var partner = await _repository.GetByIdAsync(id, cancellationToken);
 
-        return partner is null ? null: _mapper.Map<PartnerDetailsDto>(partner); ;
+        return partner is null ? null : _mapper.Map<PartnerDetailsDto>(partner);
     }
 
     public async Task<PaginatedResult<PartnerDetailsDto>> GetAllAsync(string? search, PartnerType? type, bool includeInactive, int page, int pageSize, CancellationToken cancellationToken = default)
@@ -26,7 +25,7 @@ public class PartnerService(IPartnerRepository repository, IMapper mapper) : IPa
 
         var (partners, totalCount) = await _repository.GetAllAsync(search, typeString, includeInactive, page, pageSize, cancellationToken);
 
-        var items = _mapper.Map<List<PartnerDetailsDto>>(partners); ;
+        var items = _mapper.Map<List<PartnerDetailsDto>>(partners);
 
         return new PaginatedResult<PartnerDetailsDto>
         {
@@ -95,12 +94,8 @@ public class PartnerService(IPartnerRepository repository, IMapper mapper) : IPa
             throw new ConflictException("Já existe outra Entidade registado com este número fiscal.");
         }
 
-        partner.Name = dto.Name.Trim();
+        _mapper.Map(dto, partner);
         partner.TaxNumber = cleanedTaxNumber;
-        partner.Type = dto.Type.ToString();
-        partner.Email = dto.Email;
-        partner.CreditLimit = dto.CreditLimit;
-        partner.IsActive = dto.IsActive; 
         partner.UpdatedAt = DateTime.UtcNow;
         partner.Version += 1;
 
@@ -115,7 +110,7 @@ public class PartnerService(IPartnerRepository repository, IMapper mapper) : IPa
     {
         if (creditLimit < 0 || creditLimit > 1_000_000)
         {
-            throw new ArgumentException(nameof(creditLimit), "O limite de crédito deve estar entre 0 e 1.000.000.");
+            throw new ArgumentException("O limite de crédito deve estar entre 0 e 1.000.000.", nameof(creditLimit));
         }
 
         if (decimal.Round(creditLimit, 2) != creditLimit)

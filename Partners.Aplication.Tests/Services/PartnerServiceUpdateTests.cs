@@ -1,6 +1,8 @@
+using AutoMapper;
 using FluentAssertions;
 using Moq;
 using Partners.Application;
+using Partners.Application.Exceptions;
 using Partners.Domain;
 using Partners.Domain.Interfaces;
 using Partners.Aplication.Tests.TestData;
@@ -11,12 +13,14 @@ namespace Partners.Aplication.Tests.Services;
 public class PartnerServiceUpdateTests
 {
     private readonly Mock<IPartnerRepository> _repositoryMock;
+    private readonly Mock<IMapper> _mapperMock;
     private readonly PartnerService _sut;
 
     public PartnerServiceUpdateTests()
     {
         _repositoryMock = new Mock<IPartnerRepository>();
-        _sut = new PartnerService(_repositoryMock.Object);
+        _mapperMock = new Mock<IMapper>();
+        _sut = new PartnerService(_repositoryMock.Object, _mapperMock.Object);
     }
 
     [Fact]
@@ -36,6 +40,15 @@ public class PartnerServiceUpdateTests
             Version = 1
         };
 
+        var expectedDto = new PartnerDetailsDto
+        {
+            Id = existing.Id,
+            Name = "Acme Updated Lda",
+            Type = PartnerType.SUPPLIER,
+            IsActive = false,
+            Version = 2
+        };
+
         _repositoryMock
             .Setup(r => r.GetByIdAsync(PartnerTestData.ExistingId, It.IsAny<CancellationToken>()))
             .ReturnsAsync(existing);
@@ -43,6 +56,14 @@ public class PartnerServiceUpdateTests
         _repositoryMock
             .Setup(r => r.ExistsByTaxNumberAsync(dto.TaxNumber, PartnerTestData.ExistingId, It.IsAny<CancellationToken>()))
             .ReturnsAsync(false);
+
+        _mapperMock
+            .Setup(m => m.Map(dto, existing, It.IsAny<Type>()))
+            .Returns(existing);
+
+        _mapperMock
+            .Setup(m => m.Map<PartnerDetailsDto>(existing))
+            .Returns(expectedDto);
 
         // Act
         var result = await _sut.UpdateAsync(PartnerTestData.ExistingId, dto);
@@ -80,7 +101,7 @@ public class PartnerServiceUpdateTests
     }
 
     [Fact]
-    public async Task UpdateAsync_WhenVersionDoesNotMatch_ShouldThrowInvalidOperationException()
+    public async Task UpdateAsync_WhenVersionDoesNotMatch_ShouldThrowConflictException()
     {
         // Arrange
         var existing = PartnerTestData.BuildPartner(version: 2);
@@ -101,8 +122,7 @@ public class PartnerServiceUpdateTests
         // Act
         var act = async () => await _sut.UpdateAsync(PartnerTestData.ExistingId, dto);
 
-        // Assert
-        await act.Should().ThrowAsync<InvalidOperationException>()
-            .WithMessage("O registo foi modificado por outro utilizador. Por favor, atualize os dados.");
+        // Assert — mantém ConflictException conforme pedido
+        await act.Should().ThrowAsync<ConflictException>();
     }
 }

@@ -8,16 +8,14 @@ namespace Partners.Aplication.Mappings
     {
         public MappingProfile()
         {
-            ConfigureNamingConventions();
-            CreatePartnerMappingg();
-        }
-        private void ConfigureNamingConventions()
-        {
-            SourceMemberNamingConvention = LowerUnderscoreNamingConvention.Instance;
+
+            SourceMemberNamingConvention = PascalCaseNamingConvention.Instance;
             DestinationMemberNamingConvention = PascalCaseNamingConvention.Instance;
+
+            ConfigurePartnerMappings();
         }
 
-        private void CreatePartnerMappingg()
+        private void ConfigurePartnerMappings()
         {
             CreateMap<PartnerDetailsDto, Partner>().ReverseMap();
             CreateMap<CreatePartnerDto, Partner>().ReverseMap();
