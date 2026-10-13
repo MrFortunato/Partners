@@ -21,11 +21,9 @@ public class PartnersWebAppFactory : WebApplicationFactory<Program>
 
         builder.ConfigureServices(services =>
         {
-            // Remove os registos originais do AppDbContext (SQL Server) feitos pelo AddInfrastructure.
             services.RemoveAll<DbContextOptions<AppDbContext>>();
             services.RemoveAll<AppDbContext>();
 
-            // Regista o AppDbContext em InMemory (isolado por teste via _databaseName).
             services.AddDbContext<AppDbContext>(options =>
             {
                 options.UseInMemoryDatabase(_databaseName);

@@ -29,7 +29,6 @@ COMANDOS
   dotnet test Partners.E2E.Tests         # 3 E2E
 
 PACOTES: xunit, Moq, FluentAssertions, AutoMapper, Mvc.Testing, EFCore.InMemory
-CI: .github/workflows/tests.yml (corre em push/PR para main e develop)
 
 EXCECOES E CODIGOS HTTP
   ArgumentException          -> 400 BadRequest

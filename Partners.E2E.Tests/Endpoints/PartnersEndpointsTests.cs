@@ -1,8 +1,10 @@
-using System.Net;
-using System.Net.Http.Json;
 using FluentAssertions;
+using Partners.Application;
+using Partners.Domain;
 using Partners.E2E.Tests.Infrastructure;
 using Partners.E2E.Tests.Models;
+using System.Net;
+using System.Net.Http.Json;
 using Xunit;
 
 namespace Partners.E2E.Tests.Endpoints;
@@ -25,13 +27,13 @@ public class PartnersEndpointsTests : IClassFixture<PartnersWebAppFactory>
     public async Task POST_CreatePartner_WithValidPayload_ShouldReturn201Created()
     {
         // Arrange
-        var request = new
+        CreatePartnerDto request = new()
         {
-            name = "Acme Lda",
-            taxNumber = "123456789",
-            type = "CUSTOMER",
-            email = "contact@acme.ao",
-            creditLimit = 5000.00m
+            Name = "Acme Lda",
+            TaxNumber = "123456789",
+            Type = PartnerType.CUSTOMER,
+            Email = "contact@acme.ao",
+            CreditLimit = 5000m
         };
 
         // Act
@@ -81,26 +83,26 @@ public class PartnersEndpointsTests : IClassFixture<PartnersWebAppFactory>
     public async Task FullLifecycle_Create_Update_Get_ShouldPersistChanges()
     {
         // 1. CREATE
-        var createRequest = new
+        CreatePartnerDto createRequest = new()
         {
-            name = "Lifecycle Partner",
-            taxNumber = "777777777",
-            type = "CUSTOMER",
-            creditLimit = 3000m
+            Name = "Lifecycle Partner",
+            TaxNumber = "777777777",
+            Type = PartnerType.CUSTOMER, 
+            CreditLimit = 3000m
         };
         var createResponse = await _client.PostAsJsonAsync("/api/partners", createRequest);
         createResponse.StatusCode.Should().Be(HttpStatusCode.Created);
         var created = await createResponse.Content.ReadFromJsonAsync<PartnerResponse>();
 
         // 2. UPDATE
-        var updateRequest = new
+        UpdatePartnerDto updateRequest = new()
         {
-            name = "Lifecycle Updated",
-            taxNumber = "888888888",
-            type = "SUPPLIER",
-            creditLimit = 6000m,
-            isActive = false,
-            version = created!.Version
+            Name = "Lifecycle Updated",
+            TaxNumber = "888888888",
+            Type = PartnerType.SUPPLIER,
+            CreditLimit = 6000m,
+            IsActive = false,
+            Version = created!.Version
         };
         var updateResponse = await _client.PutAsJsonAsync($"/api/partners/{created.Id}", updateRequest);
         updateResponse.StatusCode.Should().Be(HttpStatusCode.OK);

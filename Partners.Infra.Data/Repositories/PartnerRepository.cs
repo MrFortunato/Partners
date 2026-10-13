@@ -20,7 +20,15 @@ public class PartnerRepository(AppDbContext dbContext) : IPartnerRepository
 
         if (!string.IsNullOrEmpty(type))
         {
-            query = query.Where(p => p.Type == type);
+            var normalizedType = type.Trim().ToUpperInvariant();
+
+            query = normalizedType switch
+            {
+                "CUSTOMER" => query.Where(p => p.Type == "CUSTOMER" || p.Type == "BOTH"),
+                "SUPPLIER" => query.Where(p => p.Type == "SUPPLIER" || p.Type == "BOTH"),
+                "BOTH" => query.Where(p => p.Type == "BOTH"),
+                _ => query.Where(p => p.Type == normalizedType)
+            };
         }
 
         if (!string.IsNullOrWhiteSpace(search))

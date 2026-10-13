@@ -9,9 +9,17 @@ public class CreatePartnerDto
     [StringLength(100, MinimumLength = 2, ErrorMessage = "O Name deve ter entre 2 e 100 caracteres.")]
     public string Name { get; set; } = string.Empty;
 
+    private string _taxNumber = string.Empty;
+
     [Required(ErrorMessage = "O número fiscal é obrigatório.")]
     [RegularExpression(@"^\d{9}$", ErrorMessage = "O número fiscal deve conter exatamente 9 dígitos numéricos.")]
-    public string TaxNumber { get; set; } = string.Empty;
+    public string TaxNumber
+    {
+        get => _taxNumber;
+        set => _taxNumber = string.IsNullOrWhiteSpace(value)
+            ? string.Empty
+            : new string(value.Where(char.IsDigit).ToArray());
+    }
 
     [Required(ErrorMessage = "O tipo de Entidade é obrigatório.")]
     [EnumDataType(typeof(PartnerType), ErrorMessage = "O tipo de Entidade deve ser CUSTOMER, SUPPLIER ou BOTH.")]

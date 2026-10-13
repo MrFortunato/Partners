@@ -34,6 +34,7 @@ public class PartnerServiceCreateTests
             Type = PartnerType.BOTH,
             Email = PartnerTestData.Email,
             CreditLimit = PartnerTestData.ValidCreditLimit
+            
         };
 
         var partner = PartnerTestData.BuildPartner(name: dto.Name, type: PartnerType.BOTH);

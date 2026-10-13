@@ -34,7 +34,7 @@ public class PartnerServiceUpdateTests
             Name = "Acme Updated Lda",
             TaxNumber = "987654321",
             Type = PartnerType.SUPPLIER,
-            Email = "new@acme.pt",
+            Email = "new@acme.ao",
             CreditLimit = 7500m,
             IsActive = false,
             Version = 1
@@ -58,7 +58,7 @@ public class PartnerServiceUpdateTests
             .ReturnsAsync(false);
 
         _mapperMock
-            .Setup(m => m.Map(dto, existing, It.IsAny<Type>()))
+            .Setup(m => m.Map(dto, existing))
             .Returns(existing);
 
         _mapperMock
