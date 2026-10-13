@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Partners.Aplication.Mappings;
 using Partners.Application;
 using Partners.Domain.Interfaces;
 using Partners.Infra.Data;
@@ -29,6 +30,9 @@ namespace Partners.Infra.Ioc
         {
             services.AddScoped<IPartnerRepository, PartnerRepository>();
             services.AddScoped<IPartnerService, PartnerService>();
+            services.AddAutoMapper(cfg => {
+                cfg.AddProfile<MappingProfile>();
+            });
             return services;
         }
     }
