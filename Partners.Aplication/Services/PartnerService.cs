@@ -3,7 +3,6 @@ using Partners.Application.Exceptions;
 using Partners.Application.Pagination;
 using Partners.Domain;
 using Partners.Domain.Interfaces;
-using System.Text.RegularExpressions;
 
 namespace Partners.Application;
 
@@ -47,12 +46,7 @@ public class PartnerService(IPartnerRepository repository, IMapper mapper) : IPa
             throw new ArgumentException("Tipo de Entidade inválido.", nameof(dto.Type));
         }
 
-        var cleanedTaxNumber = Regex.Replace(dto.TaxNumber ?? string.Empty, @"\D", "");
-
-        if (cleanedTaxNumber.Length != 9)
-        {
-            throw new ArgumentException("O número fiscal deve conter exatamente 9 dígitos numéricos.");
-        }
+        var cleanedTaxNumber = NormalizeTaxNumber(dto.TaxNumber);
 
         if (await _repository.ExistsByTaxNumberAsync(cleanedTaxNumber, cancellationToken: cancellationToken))
         {
@@ -61,6 +55,8 @@ public class PartnerService(IPartnerRepository repository, IMapper mapper) : IPa
 
         var partner = _mapper.Map<Partner>(dto);
         partner.Id = Guid.NewGuid();
+        partner.TaxNumber = cleanedTaxNumber;
+        partner.Name = partner.Name.Trim();
         partner.Version = 1;
         partner.CreatedAt = DateTime.UtcNow;
 
@@ -84,11 +80,7 @@ public class PartnerService(IPartnerRepository repository, IMapper mapper) : IPa
             throw new ConflictException("O registo foi modificado por outro utilizador. Por favor, atualize os dados.");
         }
 
-        var cleanedTaxNumber = Regex.Replace(dto.TaxNumber ?? string.Empty, @"\D", "");
-        if (cleanedTaxNumber.Length != 9)
-        {
-            throw new ArgumentException("O número fiscal deve conter exatamente 9 dígitos numéricos.");
-        }
+        var cleanedTaxNumber = NormalizeTaxNumber(dto.TaxNumber);
 
         var existingPartnerWithTax = await _repository.ExistsByTaxNumberAsync(cleanedTaxNumber, id, cancellationToken);
         if (existingPartnerWithTax)
@@ -98,6 +90,7 @@ public class PartnerService(IPartnerRepository repository, IMapper mapper) : IPa
 
         _mapper.Map(dto, partner);
         partner.TaxNumber = cleanedTaxNumber;
+        partner.Name = partner.Name?.Trim() ?? string.Empty;
         partner.UpdatedAt = DateTime.UtcNow;
         partner.Version += 1;
 
@@ -121,5 +114,32 @@ public class PartnerService(IPartnerRepository repository, IMapper mapper) : IPa
         }
     }
 
-  
+    /// <summary>
+    /// Normaliza o número fiscal: rejeita caracteres inválidos (letras, símbolos),
+    /// descarta apenas separadores de formatação (., espaço, -) e exige 9 dígitos.
+    /// </summary>
+    private static string NormalizeTaxNumber(string? raw)
+    {
+        if (string.IsNullOrWhiteSpace(raw))
+        {
+            throw new ArgumentException("O número fiscal é obrigatório.");
+        }
+
+        var trimmed = raw.Trim();
+
+        // Rejeita qualquer caractere que não seja dígito nem separador de formatação.
+        if (trimmed.Any(c => !char.IsDigit(c) && c != '.' && c != ' ' && c != '-'))
+        {
+            throw new ArgumentException("O número fiscal contém caracteres inválidos. Apenas dígitos, pontos, espaços e hífens são permitidos.");
+        }
+
+        var digits = new string(trimmed.Where(char.IsDigit).ToArray());
+
+        if (digits.Length != 9)
+        {
+            throw new ArgumentException("O número fiscal deve conter exatamente 9 dígitos numéricos.");
+        }
+
+        return digits;
+    }
 }
