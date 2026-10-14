@@ -61,6 +61,8 @@ public class PartnerService(IPartnerRepository repository, IMapper mapper) : IPa
 
         var partner = _mapper.Map<Partner>(dto);
         partner.Id = Guid.NewGuid();
+        partner.Version = 1;
+        partner.CreatedAt = DateTime.UtcNow;
 
         _repository.Add(partner);
 

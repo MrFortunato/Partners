@@ -38,7 +38,13 @@ public class PartnerServiceCreateTests
         };
 
         var partner = PartnerTestData.BuildPartner(name: dto.Name, type: PartnerType.BOTH);
-        var expectedDto = new PartnerDetailsDto { Id = partner.Id, Name = dto.Name, Type = PartnerType.BOTH };
+        var expectedDto = new PartnerDetailsDto
+        {
+            Id = partner.Id,
+            Name = dto.Name,
+            Type = PartnerType.BOTH,
+            Version = partner.Version
+        };
 
         _repositoryMock
             .Setup(r => r.ExistsByTaxNumberAsync(dto.TaxNumber, null, It.IsAny<CancellationToken>()))

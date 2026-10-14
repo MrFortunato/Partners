@@ -51,6 +51,7 @@ public class PartnersControllerTests
         var result = await _sut.GetById(id);
 
         // Assert
-        result.Result.Should().BeOfType<NotFoundResult>();
+        result.Result.Should().BeOfType<NotFoundObjectResult>()
+            .Which.StatusCode.Should().Be(404);
     }
 }

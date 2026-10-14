@@ -2,7 +2,6 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.DependencyInjection.Extensions;
 using Partners.Infra.Data;
 
 namespace Partners.E2E.Tests.Infrastructure;
@@ -21,8 +20,18 @@ public class PartnersWebAppFactory : WebApplicationFactory<Program>
 
         builder.ConfigureServices(services =>
         {
-            services.RemoveAll<DbContextOptions<AppDbContext>>();
-            services.RemoveAll<AppDbContext>();
+
+            for (int i = services.Count - 1; i >= 0; i--)
+            {
+                var type = services[i].ServiceType;
+                if (type == typeof(AppDbContext)
+                    || type == typeof(DbContextOptions)
+                    || type == typeof(DbContextOptions<AppDbContext>)
+                    || type.Namespace?.StartsWith("Microsoft.EntityFrameworkCore") == true)
+                {
+                    services.RemoveAt(i);
+                }
+            }
 
             services.AddDbContext<AppDbContext>(options =>
             {
