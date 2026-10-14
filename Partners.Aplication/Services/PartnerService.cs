@@ -114,10 +114,6 @@ public class PartnerService(IPartnerRepository repository, IMapper mapper) : IPa
         }
     }
 
-    /// <summary>
-    /// Normaliza o número fiscal: rejeita caracteres inválidos (letras, símbolos),
-    /// descarta apenas separadores de formatação (., espaço, -) e exige 9 dígitos.
-    /// </summary>
     private static string NormalizeTaxNumber(string? raw)
     {
         if (string.IsNullOrWhiteSpace(raw))
@@ -127,7 +123,6 @@ public class PartnerService(IPartnerRepository repository, IMapper mapper) : IPa
 
         var trimmed = raw.Trim();
 
-        // Rejeita qualquer caractere que não seja dígito nem separador de formatação.
         if (trimmed.Any(c => !char.IsDigit(c) && c != '.' && c != ' ' && c != '-'))
         {
             throw new ArgumentException("O número fiscal contém caracteres inválidos. Apenas dígitos, pontos, espaços e hífens são permitidos.");
